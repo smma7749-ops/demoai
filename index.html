@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Agent</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background: linear-gradient(135deg,#74ebd5,#9face6);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    width:350px;
+    text-align:center;
+}
+
+h1{
+    margin-bottom:20px;
+    color:#333;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-bottom:15px;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:#4CAF50;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#45a049;
+}
+
+#weather{
+    margin-top:20px;
+    text-align:left;
+    line-height:1.8;
+}
+
+.error{
+    color:red;
+    margin-top:15px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌦 Weather Agent</h1>
+
+    <input type="text" id="city" placeholder="Enter City Name">
+
+    <button onclick="getWeather()">Get Weather</button>
+
+    <div id="weather"></div>
+</div>
+
+<script>
+async function getWeather() {
+
+    const city = document.getElementById("city").value.trim();
+
+    if (!city) {
+        alert("Please enter a city name");
+        return;
+    }
+
+    // Replace with your OpenWeather API Key
+    const apiKey = "bdaa8c4819299b34eb191c4881c05fb8";
+
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+    try {
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (Number(data.cod) !== 200) {
+            document.getElementById("weather").innerHTML =
+                `<p class="error">❌ City not found!</p>`;
+            return;
+        }
+
+        document.getElementById("weather").innerHTML = `
+            <h3>📍 ${data.name}, ${data.sys.country}</h3>
+            <p>🌡 Temperature: ${data.main.temp} °C</p>
+            <p>🤗 Feels Like: ${data.main.feels_like} °C</p>
+            <p>☁ Weather: ${data.weather[0].description}</p>
+            <p>💧 Humidity: ${data.main.humidity}%</p>
+            <p>🌬 Wind Speed: ${data.wind.speed} m/s</p>
+            <p>🌅 Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}</p>
+            <p>🌇 Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}</p>
+        `;
+
+    } catch (error) {
+
+        document.getElementById("weather").innerHTML =
+            `<p class="error">❌ Something went wrong. Check API Key or Internet.</p>`;
+
+        console.error(error);
+    }
+}
+</script>
+
+</body>
+</html>
